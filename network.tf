@@ -30,45 +30,7 @@ resource "azurerm_public_ip" "appgw_public_ip" {
   sku                 = "Standard" # Standard SKU is required for WAF v2
 }
 
-# 5. Define an Azure Web Application Firewall Policy
-# This policy will be associated with the Application Gateway listener.
-resource "azurerm_web_application_firewall_policy" "waf_policy" {
-  name                = "waf-policy-per-site-example"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-
-  # Configuration for the policy
-  policy_settings {
-    mode                        = "Prevention" # Can be "Detection" or "Prevention"
-    request_body_check          = true
-    max_request_body_size_in_kb = 128
-    file_upload_limit_in_mb     = 100
-  }
-
-  # Managed Rules: OWASP Core Rule Set (CRS)
-  managed_rules {
-    managed_rule_set {
-      type    = "OWASP"
-      version = "3.2" # Use the latest supported version, e.g., "3.1", "3.2", "4.0"
-    }
-  }
-
-  # You can add custom rules here if needed
-  #   custom_rule {
-  #     name     = "BlockBadIP"
-  #     priority = 100
-  #     action   = "Block"
-  #     rule_type = "MatchRule"
-  #     match_condition {
-  #       match_variable = "RemoteAddr"
-  #       operator       = "IPMatch"
-  #       negation_condition = false
-  #       values         = ["192.168.1.1/32"]
-  #     }
-  #   }
-}
-
-# 6. Deploy an Azure Application Gateway
+# 5. Deploy an Azure Application Gateway
 # This example sets up a basic Application Gateway with a single HTTP listener
 # and associates the WAF policy with that listener.
 resource "azurerm_application_gateway" "app_gateway" {
